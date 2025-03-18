@@ -14,15 +14,28 @@ const registerUser = async (req, res) => {
 
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully" });
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    res.status(201).json({
+      message: "User registered successfully",
+      token, // 🔥 Add token here
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error registering user" });
+    res.status(500).json({
+      message: "Error registering user",
+    });
+    console.log(error.message);
   }
 };
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body.email;
 
     // Check if user exists
     const user = await User.findOne({ email });
@@ -39,6 +52,7 @@ const loginUser = async (req, res) => {
     });
 
     res.json({
+      message: "Logged In Successfully",
       token,
       user: {
         id: user._id,
@@ -47,7 +61,7 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error.message);
+    console.log("Error - ", error.message);
   }
 };
 
