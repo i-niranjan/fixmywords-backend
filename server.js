@@ -9,12 +9,6 @@ app.use(express.json());
 app.use(cors());
 dbConnect();
 
-app._router.stack.forEach((r) => {
-  if (r.route && r.route.path) {
-    console.log(r.route.path);
-  }
-});
-
 app.use("/api/users", require("./routes/userRoutes"));
 
 app.get("/", (req, send) => {
